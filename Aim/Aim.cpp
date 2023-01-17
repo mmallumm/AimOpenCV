@@ -1,23 +1,23 @@
 #include "Aim.hpp"
 
-#include <opencv2/opencv.hpp>
 
 using cv::Aim;
 
 void cv::ProcImg(int, void* userData) {
   Aim* CurrentAim = reinterpret_cast<Aim*>(userData);
   cv::threshold(CurrentAim->mCurrentFrameGray, CurrentAim->mCurrentFrameBin,
-                CurrentAim->mTreshold, 255, cv::THRESH_BINARY);
+                CurrentAim->mTreshold, 255, CurrentAim->mBinaryType);
   cv::imshow("BinFrame", CurrentAim->mCurrentFrameBin);
 }
 
 Aim::Aim(int treshold) : mTreshold(treshold) {}
 
-void Aim::SetFrame(cv::Mat frame) {
+void Aim::SetFrame(cv::Mat frame, int binaryType) {
   mCurrentFrame = frame;
+  mBinaryType = binaryType;
   cv::cvtColor(mCurrentFrame, mCurrentFrameGray, CV_BGR2GRAY);
   cv::threshold(mCurrentFrameGray, mCurrentFrameBin, mTreshold, 255,
-                cv::THRESH_BINARY);
+                mBinaryType);
 }
 
 void Aim::SetFrameInRange(cv::Mat frame, cv::Scalar lowPoint,

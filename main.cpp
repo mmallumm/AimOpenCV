@@ -16,6 +16,8 @@ int main() {
   for (auto& Name : NameList) {
     cv::Mat InputImg = cv::imread(InputPath + Name);
     aim.SetFrame(InputImg);
+    aim.DialateBinFrame(cv::getStructuringElement(cv::MorphShapes::MORPH_CROSS,
+                                                  cv::Size(35, 35)));
     cv::Mat ToShow = aim.FrameWithMassCenters(3);
     cv::imshow("result", ToShow);
     cv::waitKey(-1);
@@ -157,19 +159,28 @@ int main() {
   std::string InputPath = "../task/img_zadan/gk/";
   cv::Mat GkTemplate = cv::imread(InputPath + "gk_tmplt.jpg");
   cv::Mat GkList = cv::imread(InputPath + "gk.jpg");
+  cv::GaussianBlur(GkList, GkList, cv::Size(5, 5), 4);
 
   cv::Aim GkTemplateAim(140);
   GkTemplateAim.SetFrame(GkTemplate);
-  GkTemplateAim.SetupTreshold();
   auto GkTemplateContours = GkTemplateAim.GetContours();
-  auto img1 = GkTemplateAim.FrameWithContours();
+  auto img1 = GkTemplateAim.FrameWithContours(cv::Scalar(255, 255, 0), 5);
 
-  cv::Aim GkListAim(140);
-  GkListAim.SetFrame(GkList);
+  cv::Aim GkListAim(240);
+  GkListAim.SetFrame(GkList, cv::THRESH_BINARY_INV);
   GkListAim.SetupTreshold();
   auto GkListContours = GkListAim.GetContours();
-  auto img2 = GkListAim.FrameWithContours();
 
+  for (int i = 0; i != GkListContours.size(); ++i) {
+    if (cv::matchShapes(GkListContours[i], GkTemplateContours[0],
+                        cv::CONTOURS_MATCH_I2, 0) > 0.9) {
+      cv::drawContours(GkList, GkListContours, i, cv::Scalar(0, 0, 255), 4);
+    } else {
+      cv::drawContours(GkList, GkListContours, i, cv::Scalar(0, 255, 0), 4);
+    }
+  }
+  cv::imshow("1", GkList);
+  cv::waitKey(-1);
 
   return 0;
 }

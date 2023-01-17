@@ -1,4 +1,4 @@
-#include <opencv2/core.hpp>
+#include <opencv2/opencv.hpp>
 
 namespace cv {
 void ProcImg(int, void*);
@@ -12,7 +12,7 @@ class Aim {
 
  public:
   Aim(int treshold = 0);
-  void SetFrame(cv::Mat frame);
+  void SetFrame(cv::Mat frame, int binaryType = cv::THRESH_BINARY);
   void SetFrameInRange(cv::Mat frame, cv::Scalar lowPoint,
                        cv::Scalar highPoint);
   void AddFrameInRange(cv::Mat frame, cv::Scalar lowPoint,
@@ -29,6 +29,7 @@ class Aim {
 
  private:
   int mTreshold = 0;
+  int mBinaryType = cv::THRESH_BINARY;
   cv::Mat mCurrentFrame;
   cv::Mat mCurrentFrameGray;
   cv::Mat mCurrentFrameBin;
